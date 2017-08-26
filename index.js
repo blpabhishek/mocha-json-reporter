@@ -1,24 +1,65 @@
 var mocha = require('mocha');
-module.exports = MyReporter;
+var fs = require('fs');
 
-function MyReporter(runner,options) {
-  console.log(runner,options);
+module.exports = JSONToFile;
+
+function writeToFile(fileName,failed,passed,pending) {
+  let report={};
+  report.total=failed.length+passed.length+pending.length;
+  report.passed=passed;
+  report.failed=failed;
+  report.pending=pending;
+  fs.writeFileSync(fileName,JSON.stringify(report));
+}
+
+function JSONToFile(runner,options) {
+  let userOptions=options.reporterOptions;
+
   mocha.reporters.Base.call(this, runner);
-  var passes = 0;
-  var failures = 0;
+
+  var currentSuite=[];
+  var failed=[];
+  var passed=[];
+  var pending=[];
+
+  runner.on('test end',function(test){
+  });
 
   runner.on('pass', function(test){
-    passes++;
-    console.log('Hi hi hi hipass: %s', test.fullTitle());
+    let result={};
+    result.suite=currentSuite.join("/");
+    result.title=test.title;
+    passed.push(result);
+  });
+
+  runner.on('suite',function(suite){
+    currentSuite.push(suite.title);
+  });
+
+  runner.on('suite end',function(suite){
+    currentSuite.pop();
   });
 
   runner.on('fail', function(test, err){
-    failures++;
-    console.log('fail: %s -- error: %s', test.fullTitle(), err.message);
+    let result={};
+    result.suite=currentSuite.join("/");
+    result.title=test.title;
+    result.errMessage=test.err.message;
+    result.actual=test.err.actual;
+    result.expected=test.err.expected||"";
+    failed.push(result);
+  });
+
+  runner.on('pending', function(test, err){
+    let result={};
+    result.suite=currentSuite.join("/");
+    result.title=test.title;
+    pending.push(result);
   });
 
   runner.on('end', function(){
-    console.log('end: %d/%d', passes, passes + failures);
-    process.exit(failures);
+    let fileName=userOptions.fileName || "__report.json";
+    writeToFile(fileName,failed,passed,pending);
+    process.exit(0);
   });
 }
