@@ -9,7 +9,7 @@ function MyReporter(runner,options) {
 
   runner.on('pass', function(test){
     passes++;
-    console.log('pass: %s', test.fullTitle());
+    console.log('Hi hi hi hipass: %s', test.fullTitle());
   });
 
   runner.on('fail', function(test, err){
