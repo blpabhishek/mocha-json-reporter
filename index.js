@@ -22,10 +22,6 @@ function JSONToFile(runner,options) {
   var pending=[];
 
   runner.on('test',function(test){
-    let suite=currentSuite.join("/");
-    let testTitle=`${suite}/${test.title}`
-    let logFile=userOptions.logFile || "test.log";
-    fs.appendFileSync(logFile,`running ${testTitle}\n`);
   });
 
   runner.on('pass', function(test){
@@ -37,6 +33,9 @@ function JSONToFile(runner,options) {
 
   runner.on('suite',function(suite){
     currentSuite.push(suite.title);
+    let fullSuite=currentSuite.join("/");
+    let logFile=userOptions.logFile || "test.log";
+    fs.appendFileSync(logFile,`running ${fullSuite}\n`);
   });
 
   runner.on('suite end',function(suite){
