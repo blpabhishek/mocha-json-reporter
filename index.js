@@ -14,7 +14,6 @@ function writeToFile(fileName,failed,passed,pending) {
 
 function JSONToFile(runner,options) {
   let userOptions=options.reporterOptions;
-
   mocha.reporters.Base.call(this, runner);
 
   var currentSuite=[];
@@ -22,7 +21,11 @@ function JSONToFile(runner,options) {
   var passed=[];
   var pending=[];
 
-  runner.on('test end',function(test){
+  runner.on('test',function(test){
+    let suite=currentSuite.join("/");
+    let testTitle=`${suite}/${test.title}`
+    let logFile=userOptions.logFile || "test.log";
+    fs.appendFileSync(logFile,`running ${testTitle}\n`);
   });
 
   runner.on('pass', function(test){
