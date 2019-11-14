@@ -13,7 +13,7 @@ function writeToFile(fileName,failed,passed,pending) {
 }
 
 function JSONToFile(runner,options) {
-  let userOptions=options.reporterOptions;
+  let userOptions=options.reporterOptions || {};
   mocha.reporters.Base.call(this, runner);
 
   var currentSuite=[];
