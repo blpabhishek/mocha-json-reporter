@@ -5,10 +5,18 @@ module.exports = JSONToFile;
 
 function writeToFile(fileName,failed,passed,pending) {
   let report={};
-  report.total=failed.length+passed.length+pending.length;
-  report.passed=passed;
-  report.failed=failed;
-  report.pending=pending;
+  report.stats = {
+    total: failed.length + passed.length + pending.length,
+    failure: failed.length,
+    passed: passed.length
+  };
+  const failures = failed.map(x=>{
+    x.failed = true;
+    return x;
+  });
+  report.tests = [
+    ...failures, ...passed, ...pending
+  ];
   fs.writeFileSync(fileName,JSON.stringify(report));
 }
 
