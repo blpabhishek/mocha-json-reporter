@@ -14,9 +14,10 @@ function writeToFile(fileName,failed,passed,pending) {
     x.failed = true;
     return x;
   });
-  report.tests = [
-    ...failures, ...passed, ...pending
-  ];
+  report.tests = [...failures, ...passed, ...pending];
+  report.tests.forEach((test)=>{
+    test.testName = test.title;
+  });
   fs.writeFileSync(fileName,JSON.stringify(report));
 }
 
